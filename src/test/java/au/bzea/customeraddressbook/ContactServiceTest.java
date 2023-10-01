@@ -104,21 +104,19 @@ public class ContactServiceTest {
 
         Contact con1 = new Contact("Contact#1", "0434123456");
         con1.setAddressBook(addressBook1);
-        newContacts.add(con1);
+        oldContacts.add(con1);
         Contact con2 = new Contact("Contact#1", "0434123456");
         con2.setAddressBookId(addressBook2.getId());
-        oldContacts.add(con2);
+        newContacts.add(con2);
 
         Contact con3 = new Contact("Contact#2", "1234");
         con3.setAddressBook(addressBook1);
-        newContacts.add(con3);
+        oldContacts.add(con3);
         Contact con4 = new Contact("Contact#2", "1234");
         con1.setAddressBookId(addressBook2.getId());
-        oldContacts.add(con4);
+        newContacts.add(con4);
 
         ContactService service = new ContactService(repository);
-        service.updateContacts(oldContacts, newContacts);
-
         assertFalse(service.compareAddressBooks(oldContacts, newContacts));
     }
     

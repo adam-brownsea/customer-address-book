@@ -41,7 +41,7 @@ public class ContactService {
         for(Contact oldContact: oldContacts) {
             logger.info(oldContact.getAddressBook().getId() +":"+ newContacts.get(i).getAddressBookId());
             logger.info(oldContact.getAddressBook().getId() +":"+ newContacts.get(i).getAddressBookId());
-            if (!oldContact.getAddressBook().getId().equals(newContacts.get(i).getAddressBook().getId()))
+            if (!oldContact.getAddressBook().getId().equals(newContacts.get(i).getAddressBookId()))
                 return false;
             i++;
         }
