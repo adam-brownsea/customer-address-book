@@ -8,6 +8,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,6 +36,10 @@ public class Contact {
     @ManyToOne
     @JoinColumn(name = "address_book", nullable = false)
     private AddressBook addressBook;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Transient
+    private Long addressBookId;
 
     public Contact(String name, String phoneNumber) {
         this.name = name;

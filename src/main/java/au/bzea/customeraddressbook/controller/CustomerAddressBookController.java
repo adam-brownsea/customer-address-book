@@ -39,8 +39,7 @@ public class CustomerAddressBookController {
         return addressBookRespository.save(addressBook);
     }
 
-    /*
-    // retrieve all contacts
+        // retrieve all contacts
     @GetMapping("/contact")
     Iterable<Contact> contactAll() {
         return contactRespository.findAll();
@@ -56,7 +55,9 @@ public class CustomerAddressBookController {
     //create new contact
     @PostMapping("/contact")
     Contact contactSave(@RequestBody Contact contact) {
+        AddressBook addressBook = addressBookRespository.findById(contact.getAddressBookId()).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND));
+        contact.setAddressBook(addressBook);
         return contactRespository.save(contact);
     }
-    */
 }
