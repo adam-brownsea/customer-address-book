@@ -100,6 +100,7 @@ class ContactRepositoryTest {
 
         Contact con = repository.findById(con2.getId()).get();
         con.setName(updatedContact.getName());
+        con.setPhoneNumber(updatedContact.getPhoneNumber());
         repository.save(con);
 
         Contact checkContact = repository.findById(con2.getId()).get();
@@ -107,7 +108,8 @@ class ContactRepositoryTest {
         assertAll(
             "Grouped store an addressBook assertions",
             () -> assertEquals(checkContact.getId(), con2.getId()),
-            () -> assertEquals(checkContact.getName(), updatedContact.getName())
+            () -> assertEquals(checkContact.getName(), updatedContact.getName()),
+            () -> assertEquals(checkContact.getPhoneNumber(), updatedContact.getPhoneNumber())
         );
     }
 

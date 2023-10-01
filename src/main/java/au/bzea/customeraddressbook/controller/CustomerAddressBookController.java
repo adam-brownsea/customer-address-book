@@ -92,7 +92,7 @@ public class CustomerAddressBookController {
     Contact contactUpdate(@RequestBody Contact contact, @PathVariable Long id) {
 
         //update the contact
-        return contactRepository.findById(contact.getAddressBookId())
+        return contactRepository.findById(id)
             .map(contactUpdate -> {
                 if (contact.getAddressBookId() != null 
                 && !contactUpdate.getAddressBook().getId().equals(contact.getAddressBookId())) 
