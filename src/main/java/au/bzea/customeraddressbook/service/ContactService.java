@@ -4,11 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-
 import au.bzea.customeraddressbook.model.Contact;
 import au.bzea.customeraddressbook.repository.ContactRepository;
 
@@ -72,4 +68,17 @@ public class ContactService {
 
     }
     
+
+    public Iterable<Contact> findUniqueNames(Iterable<Contact> contacts) {
+        ArrayList<String> names = new ArrayList<>();
+        ArrayList<Contact> newList = new ArrayList<>();
+        for (Contact contact: contacts) {
+            if (!names.contains(contact.getName())) {
+                newList.add(contact);
+                names.add(contact.getName());
+            }
+        }
+        
+        return newList::iterator;
+    }
 }

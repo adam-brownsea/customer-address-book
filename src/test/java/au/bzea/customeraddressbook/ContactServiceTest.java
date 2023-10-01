@@ -1,18 +1,16 @@
 package au.bzea.customeraddressbook;
 
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-
 import au.bzea.customeraddressbook.model.AddressBook;
 import au.bzea.customeraddressbook.model.Contact;
 import au.bzea.customeraddressbook.repository.AddressBookRepository;
@@ -21,7 +19,6 @@ import au.bzea.customeraddressbook.service.ContactService;
 
 @DataJpaTest
 public class ContactServiceTest {
-    private static Logger logger = Logger.getLogger(ContactServiceTest.class.getName());
 
     @Autowired
     private TestEntityManager entityManager;
@@ -143,5 +140,33 @@ public class ContactServiceTest {
             () -> assertEquals(oldContacts.get(1).getPhoneNumber(), con4.getPhoneNumber())
         );
 
+    }    
+
+    @Test
+    void should_only_return_unique_contacts_by_name() {
+        AddressBook addressBook1 = new AddressBook("Book1 name");
+        AddressBook addressBook2 = new AddressBook("Book2 name");
+        entityManager.persist(addressBook1);
+        entityManager.persist(addressBook2);
+
+        Contact con1 = new Contact("Contact#1", "0434123456");
+        con1.setAddressBook(addressBook1);
+        entityManager.persist(con1);
+
+        Contact con2 = new Contact("Contact#1", "0434123456");
+        con2.setAddressBook(addressBook2);
+        entityManager.persist(con2);
+
+        Contact con3 = new Contact("Contact#2", "5678");
+        con3.setAddressBook(addressBook1);
+        entityManager.persist(con3);
+
+        Contact con4 = new Contact("Contact#2", "5678");
+        con4.setAddressBook(addressBook2);
+        entityManager.persist(con4);
+
+        ContactService service = new ContactService(repository);
+        Iterable<Contact> contacts = service.findUniqueNames(repository.findAll());
+        assertThat(contacts).hasSize(2).contains(con1, con3);
     }    
 }

@@ -5,9 +5,7 @@ import au.bzea.customeraddressbook.model.Contact;
 import au.bzea.customeraddressbook.repository.AddressBookRepository;
 import au.bzea.customeraddressbook.repository.ContactRepository;
 import au.bzea.customeraddressbook.service.ContactService;
-
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -47,16 +45,23 @@ public class CustomerAddressBookController {
         return addressBookRespository.save(addressBook);
     }
 
-    // retrieve all contacts or only for an address book
+    // retrieve all contacts or only for an address book or unique
+    // including address book overrides unique
     //- Users should be able to print all contacts in an address book
+    //- Users should be able to print a unique set of all contacts across multiple address books
     @GetMapping("/contact")
-    Iterable<Contact> contactAll(@RequestParam(required = false) Long addressBookId) {
+    Iterable<Contact> contactAll(@RequestParam(required = false) Long addressBookId, @RequestParam(required = false) boolean unique) {
         if (addressBookId != null) {
             // find the address book and return only contacts for that address book
             AddressBook addressBook = addressBookRespository.findById(addressBookId).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND));
             return contactRepository.findByAddressBook(addressBook);
+        } else if (unique) {
+            ContactService service = new ContactService(contactRepository);
+
+            return service.findUniqueNames(contactRepository.findAll());
         }
+
         return contactRepository.findAll();
     }
 

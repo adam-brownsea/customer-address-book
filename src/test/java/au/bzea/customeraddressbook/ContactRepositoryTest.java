@@ -3,12 +3,10 @@ package au.bzea.customeraddressbook;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-
 import au.bzea.customeraddressbook.model.Contact;
 import au.bzea.customeraddressbook.repository.ContactRepository;
 import au.bzea.customeraddressbook.model.AddressBook;
@@ -152,4 +150,33 @@ class ContactRepositoryTest {
 
         assertThat(repository.findAll()).isEmpty();
     }
+
+    @Test
+    void should_only_return_contacts_from_requested_address_book() {
+        AddressBook addressBook1 = new AddressBook("Book1 name");
+        AddressBook addressBook2 = new AddressBook("Book2 name");
+        entityManager.persist(addressBook1);
+        entityManager.persist(addressBook2);
+
+        Contact con1 = new Contact("Contact#1", "0434123456");
+        con1.setAddressBook(addressBook1);
+        entityManager.persist(con1);
+
+        Contact con2 = new Contact("Contact#2", "1234");
+        con2.setAddressBook(addressBook2);
+        entityManager.persist(con2);
+
+        Contact con3 = new Contact("Contact#3", "5678");
+        con3.setAddressBook(addressBook1);
+        entityManager.persist(con3);
+
+        Contact con4 = new Contact("Contact#4", "654678");
+        con4.setAddressBook(addressBook2);
+        entityManager.persist(con4);
+
+        Iterable<Contact> contacts = repository.findByAddressBook(addressBook1);
+        assertThat(contacts).hasSize(2).contains(con1, con3);
+    }
+
+
 }
