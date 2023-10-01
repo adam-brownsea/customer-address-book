@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import jakarta.persistence.Column;
@@ -35,6 +36,7 @@ public class Contact {
 
     @ManyToOne
     @JoinColumn(name = "address_book", nullable = false)
+    @JsonIgnore
     private AddressBook addressBook;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

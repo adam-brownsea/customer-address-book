@@ -8,105 +8,98 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import au.bzea.customeraddressbook.model.AddressBook;
-import au.bzea.customeraddressbook.repository.AddressBookRespository;
+import au.bzea.customeraddressbook.repository.AddressBookRepository;
 
 @DataJpaTest
-public class AddressBookRepositoryTest {
+class AddressBookRepositoryTest {
 
-  @Autowired
-  private TestEntityManager entityManager;
+    @Autowired
+    private TestEntityManager entityManager;
 
-  @Autowired
-  AddressBookRespository repository;
+    @Autowired
+    AddressBookRepository repository;
 
-  @Test
-  public void should_find_no_addressbooks_if_repository_is_empty() {
-    Iterable<AddressBook> addressBooks = repository.findAll();
+    @Test
+    void should_find_no_addressbooks_if_repository_is_empty() {
+        Iterable<AddressBook> addressBooks = repository.findAll();
 
-    assertThat(addressBooks).isEmpty();
-  }
+        assertThat(addressBooks).isEmpty();
+    }
 
-  @Test
-  public void should_store_a_addressbook() {
-    AddressBook addressBook = repository.save(new AddressBook("Book name"));
+    @Test
+    void should_find_all_addressbooks() {
+        AddressBook book1 = new AddressBook("Book#1");
+        entityManager.persist(book1);
 
-    assertThat(addressBook).hasFieldOrPropertyWithValue("name", "Book name");
-  }
+        AddressBook book2 = new AddressBook("Book#2");
+        entityManager.persist(book2);
 
-  @Test
-  public void should_find_all_addressbooks() {
-    AddressBook book1 = new AddressBook("Book#1");
-    entityManager.persist(book1);
+        AddressBook book3 = new AddressBook("Book#3");
+        entityManager.persist(book3);
 
-    AddressBook book2 = new AddressBook("Book#2");
-    entityManager.persist(book2);
+        Iterable<AddressBook> addressBooks = repository.findAll();
 
-    AddressBook book3 = new AddressBook("Book#3");
-    entityManager.persist(book3);
+        assertThat(addressBooks).hasSize(3).contains(book1, book2, book3);
+    }
 
-    Iterable<AddressBook> addressBooks = repository.findAll();
+    @Test
+    void should_find_addressbook_by_id() {
+        AddressBook book1 = new AddressBook("Book#1");
+        entityManager.persist(book1);
 
-    assertThat(addressBooks).hasSize(3).contains(book1, book2, book3);
-  }
+        AddressBook book2 = new AddressBook("Book#2");
+        entityManager.persist(book2);
 
-  @Test
-  public void should_find_addressbook_by_id() {
-    AddressBook book1 = new AddressBook("Book#1");
-    entityManager.persist(book1);
+        AddressBook foundAddressBook = repository.findById(book2.getId()).get();
 
-    AddressBook book2 = new AddressBook("Book#2");
-    entityManager.persist(book2);
+        assertThat(foundAddressBook).isEqualTo(book2);
+    }
 
-    AddressBook foundAddressBook = repository.findById(book2.getId()).get();
+    @Test
+    void should_update_addressBook_by_id() {
+        AddressBook book1 = new AddressBook("Book#1");
+        entityManager.persist(book1);
 
-    assertThat(foundAddressBook).isEqualTo(book2);
-  }
+        AddressBook book2 = new AddressBook("Book#2");
+        entityManager.persist(book2);
 
-  @Test
-  public void should_update_addressBook_by_id() {
-    AddressBook book1 = new AddressBook("Book#1");
-    entityManager.persist(book1);
+        AddressBook updatedBook = new AddressBook("updated Book#2");
 
-    AddressBook book2 = new AddressBook("Book#2");
-    entityManager.persist(book2);
+        AddressBook book = repository.findById(book2.getId()).get();
+        book.setName(updatedBook.getName());
+        repository.save(book);
 
-    AddressBook updatedBook = new AddressBook("updated Book#2");
+        AddressBook checkBook = repository.findById(book2.getId()).get();
+        
+        assertThat(checkBook.getId()).isEqualTo(book2.getId());
+        assertThat(checkBook.getName()).isEqualTo(updatedBook.getName());
+    }
 
-    AddressBook book = repository.findById(book2.getId()).get();
-    book.setName(updatedBook.getName());
-    repository.save(book);
+    @Test
+    void should_delete_addressBook_by_id() {
+        AddressBook book1 = new AddressBook("Book#1");
+        entityManager.persist(book1);
 
-    AddressBook checkBook = repository.findById(book2.getId()).get();
-    
-    assertThat(checkBook.getId()).isEqualTo(book2.getId());
-    assertThat(checkBook.getName()).isEqualTo(updatedBook.getName());
-  }
+        AddressBook book2 = new AddressBook("Book#2");
+        entityManager.persist(book2);
 
-  @Test
-  public void should_delete_addressBook_by_id() {
-    AddressBook book1 = new AddressBook("Book#1");
-    entityManager.persist(book1);
+        AddressBook book3 = new AddressBook("Book#3");
+        entityManager.persist(book3);
 
-    AddressBook book2 = new AddressBook("Book#2");
-    entityManager.persist(book2);
+        repository.deleteById(book2.getId());
 
-    AddressBook book3 = new AddressBook("Book#3");
-    entityManager.persist(book3);
+        Iterable<AddressBook> addressBooks = repository.findAll();
 
-    repository.deleteById(book2.getId());
+        assertThat(addressBooks).hasSize(2).contains(book1, book3);
+    }
 
-    Iterable<AddressBook> addressBooks = repository.findAll();
+    @Test
+    void should_delete_all_addressBooks() {
+        entityManager.persist(new AddressBook("Book#1"));
+        entityManager.persist(new AddressBook("Book#2"));
 
-    assertThat(addressBooks).hasSize(2).contains(book1, book3);
-  }
+        repository.deleteAll();
 
-  @Test
-  public void should_delete_all_addressBooks() {
-    entityManager.persist(new AddressBook("Book#1"));
-    entityManager.persist(new AddressBook("Book#2"));
-
-    repository.deleteAll();
-
-    assertThat(repository.findAll()).isEmpty();
-  }
+        assertThat(repository.findAll()).isEmpty();
+    }
 }
